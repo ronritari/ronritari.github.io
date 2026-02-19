@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" type="text/css" href="../css/bootstrap.css" />
+  <!-- Custom styles for futstats -->
+  <link href="css/futstats.css" rel="stylesheet" />
+  <!-- Responsive style -->
+  <link href="../css/responsive.css" rel="stylesheet" />
+</head>
+
+<body>
+
+<!-- Navigation bar -->
+<div class="navbar">
+    <a href="../index.html"><b>Home</b></a>
+    <a href="./"><b>FutStats</b></a>
+</div>
+
+<!-- Sections -->
+
+<!-- FutStats Dashboard -->
+<div id="futstats" class="dashboard-section">
+  <div class="dashboard-container">
+    
+    <!-- Score Section -->
+    <div class="score-section">
+      <div class="team home-team">
+        <h2 class="team-name" id="homeTeamName">Home team name</h2>
+        <div class="score" id="homeScore">0</div>
+      </div>
+      
+      <div class="timer-section">
+        <div class="timer" id="timer">00:00</div>
+      </div>
+      
+      <div class="team away-team">
+        <div class="score" id="awayScore">0</div>
+        <h2 class="team-name" id="awayTeamName">Away team name</h2>
+      </div>
+    </div>
+
+    <!-- Control Buttons Section -->
+    <div class="controls-section">
+      <!-- Home Controls -->
+      <div class="control-group home-controls">
+        <div class="buttons-top-row">
+          <button class="btn btn-action home-shot" id="homeShot">Home shot</button>
+          <button class="btn btn-action home-shot-on-goal" id="homeShotOnGoal">SOG</button>
+        </div>
+        <div class="goal-row">
+          <button class="btn btn-goal home-goal" id="homeGoal">Goal</button>
+          <div class="btn-adjust-row">
+            <button class="btn btn-adjust btn-minus" id="homeGoalMinus">−</button>
+            <button class="btn btn-adjust btn-plus" id="homeGoalPlus">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Controls -->
+      <div class="center-controls">
+        <button class="btn btn-play-pause" id="playPauseBtn">▶||</button>
+        <button class="btn btn-end-game" id="endGameBtn">End game</button>
+      </div>
+
+      <!-- Away Controls -->
+      <div class="control-group away-controls">
+        <div class="buttons-top-row">
+          <button class="btn btn-action away-shot-on-goal" id="awayShotOnGoal">SOG</button>
+          <button class="btn btn-action away-shot" id="awayShot">Away shot</button>
+        </div>
+        <div class="goal-row">
+          <button class="btn btn-goal away-goal" id="awayGoal">Goal</button>
+          <div class="btn-adjust-row">
+            <button class="btn btn-adjust btn-minus" id="awayGoalMinus">−</button>
+            <button class="btn btn-adjust btn-plus" id="awayGoalPlus">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pass Statistics Section -->
+    <div class="pass-statistics">
+      <div class="pass-stat home-pass" id="homePass">
+        <h3>Home Pass</h3>
+      </div>
+      <div class="pass-stat away-pass" id="awayPass">
+        <h3>Away Pass</h3>
+      </div>
+    </div>
+
+    <!-- Stats Bars Section -->
+    <div class="stats-section">
+      <div class="stat-row">
+        <span class="stat-label">Possession</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar home-stat" id="ballPossessionHome" style="width: 50%"></div>
+          <div class="stat-bar away-stat" id="ballPossessionAway" style="width: 50%"></div>
+        </div>
+        <div class="stat-percentages">
+          <span class="home-percentage" id="ballPossessionPercentageHome">50%</span>
+          <span class="away-percentage" id="ballPossessionPercentageAway">50%</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-label">Shots</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar home-stat" id="shotsHome" style="width: 50%"></div>
+          <div class="stat-bar away-stat" id="shotsAway" style="width: 50%"></div>
+        </div>
+        <div class="stat-numbers">
+          <span class="home-number" id="shotsHomeNumber">0</span>
+          <span class="stat-divider">-</span>
+          <span class="away-number" id="shotsAwayNumber">0</span>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <span class="stat-label">Shots on goal</span>
+        <div class="stat-bar-container">
+          <div class="stat-bar home-stat" id="shotsOnTargetHome" style="width: 50%"></div>
+          <div class="stat-bar away-stat" id="shotsOnTargetAway" style="width: 50%"></div>
+        </div>
+        <div class="stat-numbers">
+          <span class="home-number" id="shotsOnTargetHomeNumber">0</span>
+          <span class="stat-divider">-</span>
+          <span class="away-number" id="shotsOnTargetAwayNumber">0</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Bootstrap core JavaScript -->
+<script src="../js/jquery-3.4.1.min.js"></script>
+<script src="../js/bootstrap.js"></script>
+<!-- FutStats Custom JavaScript -->
+<script src="js/futstats.js"></script>
+</body>
+
+</html>
