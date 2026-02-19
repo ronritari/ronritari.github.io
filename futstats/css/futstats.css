@@ -1,0 +1,164 @@
+/* FutStats Custom Styles */
+
+/* Section Styling */
+.section {
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.project-card {
+  width: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  text-align: center;
+  padding: 40px;
+}
+
+.project-card .card-title {
+  font-size: 48px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.project-card .card-text {
+  font-size: 18px;
+  margin: 0;
+}
+
+.about-card {
+  width: 100%;
+  padding: 30px;
+  background-color: #f9f9f9;
+}
+
+.about-card .card-title {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 20px;
+  border-bottom: 3px solid #667eea;
+  padding-bottom: 10px;
+}
+
+.project-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 24px;
+  color: #333;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* Features List */
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.features-list li {
+  padding: 10px 0;
+  padding-left: 30px;
+  position: relative;
+  color: #555;
+  font-size: 16px;
+}
+
+.features-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #667eea;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Tech Stack */
+.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tech-badge {
+  display: inline-block;
+  background-color: #667eea;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Project Links */
+.project-links {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.link-button {
+  display: inline-block;
+  background-color: #667eea;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.link-button:hover {
+  background-color: #764ba2;
+  text-decoration: none;
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section {
+    padding: 20px 10px;
+  }
+
+  .project-card .card-title {
+    font-size: 36px;
+  }
+
+  .cards-container {
+    gap: 15px;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .project-links {
+    flex-direction: column;
+  }
+
+  .link-button {
+    width: 100%;
+    text-align: center;
+  }
+}
