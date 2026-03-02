@@ -15,6 +15,11 @@ const state = {
   timerRunning: false,
   timerSeconds: 0,
   timerInterval: null,
+  // Match configuration
+  configured: false,
+  halfLengthMinutes: 45,
+  currentHalf: 0, // 0 = not started, 1 = first half, 2 = second half
+  halfEnded: false, // true after first half ends before second half starts
   
   // Possession tracking
   possession: null, // 'home' or 'away' or null
@@ -28,6 +33,8 @@ const state = {
   
   // Event log with timestamps
   eventLog: []
+  ,
+  halftimeSnapshot: null
 };
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -276,7 +283,7 @@ function initializeDashboard() {
     }
   });
 
-  // End game button
+  // End game / end half button
   document.getElementById('endGameBtn').addEventListener('click', endGame);
 
   // Update initial displays
@@ -287,29 +294,170 @@ function initializeDashboard() {
   
   // Disable buttons initially (timer not running)
   disableGameButtons(true);
+
+  // Disable play until configured and show config modal
+  const playBtn = document.getElementById('playPauseBtn');
+  playBtn.disabled = true;
+  showConfigModal();
+}
+
+function showConfigModal() {
+  const modal = document.getElementById('configModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  // wire up form submit once
+  const form = document.getElementById('configForm');
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const home = document.getElementById('homeTeamInput').value || 'Home team name';
+    const away = document.getElementById('awayTeamInput').value || 'Away team name';
+    const half = parseInt(document.getElementById('halfLengthSelect').value, 10) || 45;
+
+    document.getElementById('homeTeamName').textContent = home;
+    document.getElementById('awayTeamName').textContent = away;
+
+    state.halfLengthMinutes = half;
+    state.configured = true;
+    state.currentHalf = 0;
+    state.timerSeconds = 0;
+    state.halfEnded = false;
+
+    modal.classList.add('hidden');
+    const playBtn = document.getElementById('playPauseBtn');
+    playBtn.disabled = false;
+    playBtn.textContent = 'Start first half';
+    document.getElementById('endGameBtn').disabled = true;
+    updateTimerDisplay();
+    console.log('Configuration saved:', { home, away, half });
+  };
+}
+
+function startTimerInterval() {
+  const btn = document.getElementById('playPauseBtn');
+  state.timerRunning = true;
+  btn.textContent = '⏸';
+  state.timerInterval = setInterval(() => {
+    state.timerSeconds++;
+    updateTimerDisplay();
+  }, 1000);
+  disableGameButtons(false);
+}
+
+function renderSummaryHTML(stats) {
+  // simple HTML summary for modals
+  return `
+    <div class="summary-row"><span class="summary-label">Time:</span><span class="summary-value">${stats.gameTime}</span></div>
+    <div class="summary-row"><span class="summary-label">Score:</span><span class="summary-value">${stats.homeStats.score} - ${stats.awayStats.score}</span></div>
+    <div class="summary-row"><span class="summary-label">Shots:</span><span class="summary-value">${stats.homeStats.shots} - ${stats.awayStats.shots}</span></div>
+    <div class="summary-row"><span class="summary-label">Shots on target:</span><span class="summary-value">${stats.homeStats.shotsOnTarget} - ${stats.awayStats.shotsOnTarget}</span></div>
+    <div class="summary-row"><span class="summary-label">Corners:</span><span class="summary-value">${stats.homeStats.corners} - ${stats.awayStats.corners}</span></div>
+    <div class="summary-row"><span class="summary-label">Passes:</span><span class="summary-value">${stats.homeStats.passes} - ${stats.awayStats.passes}</span></div>
+  `;
+}
+
+function showHalftimeModal() {
+  const modal = document.getElementById('halftimeModal');
+  const content = document.getElementById('halftimeContent');
+  if (!modal || !content) return;
+  const stats = state.halftimeSnapshot || getGameStats();
+  content.innerHTML = renderSummaryHTML(stats);
+  modal.classList.remove('hidden');
+
+  const startBtn = document.getElementById('startSecondHalfBtn');
+  startBtn.onclick = () => {
+    modal.classList.add('hidden');
+    // start second half from configured minute
+    state.currentHalf = 2;
+    state.timerSeconds = state.halfLengthMinutes * 60;
+    startTimerInterval();
+    const playBtn = document.getElementById('playPauseBtn');
+    playBtn.textContent = '⏸';
+    playBtn.disabled = false;
+    document.getElementById('endGameBtn').disabled = false;
+    logEvent('half_started', 'system', { half: 2 });
+  };
+}
+
+function showFinalModal() {
+  const modal = document.getElementById('finalModal');
+  const content = document.getElementById('finalContent');
+  if (!modal || !content) return;
+  const stats = getGameStats();
+  content.innerHTML = renderSummaryHTML(stats);
+  modal.classList.remove('hidden');
+
+  const closeBtn = document.getElementById('closeFinalBtn');
+  closeBtn.onclick = () => {
+    modal.classList.add('hidden');
+    resetGame();
+  };
 }
 
 function toggleTimer() {
   const btn = document.getElementById('playPauseBtn');
-  
-  if (state.timerRunning) {
-    // Pause
+  if (!state.configured) {
+    showConfigModal();
+    return;
+  }
+
+  // Start first half when nothing has started
+  if (state.currentHalf === 0) {
+    state.currentHalf = 1;
+    state.halfEnded = false;
+    state.timerSeconds = 0;
+    startTimerInterval();
+    btn.textContent = 'End first half';
+    disableGameButtons(false);
+    document.getElementById('endGameBtn').disabled = true;
+    logEvent('half_started', 'system', { half: 1 });
+    return;
+  }
+
+  // End first half when running
+  if (state.currentHalf === 1 && state.timerRunning) {
     clearInterval(state.timerInterval);
     state.timerRunning = false;
-    btn.textContent = '▶';
+    state.halfEnded = true;
+    state.halftimeSnapshot = getGameStats();
+    logEvent('half_ended', 'system', { half: 1, timerSeconds: state.timerSeconds });
     disableGameButtons(true);
-  } else {
-    // Play
-    state.timerRunning = true;
-    btn.textContent = '⏸';
-    disableGameButtons(false);
-    
-    state.timerInterval = setInterval(() => {
-      state.timerSeconds++;
-      updateTimerDisplay();
-    }, 1000);
+    btn.textContent = 'Start second half';
+    showHalftimeModal();
+    return;
   }
+
+  // Start second half after halftime summary
+  if (state.currentHalf === 1 && !state.timerRunning && state.halfEnded) {
+    state.currentHalf = 2;
+    state.halfEnded = false;
+    state.timerSeconds = state.halfLengthMinutes * 60;
+    startTimerInterval();
+    // allow pausing during second half
+    btn.textContent = '⏸';
+    btn.disabled = false;
+    document.getElementById('endGameBtn').disabled = false;
+    logEvent('half_started', 'system', { half: 2 });
+    return;
+  }
+
+  // handle pause/resume during second half
+  if (state.currentHalf === 2) {
+    if (state.timerRunning) {
+      clearInterval(state.timerInterval);
+      state.timerRunning = false;
+      btn.textContent = '▶';
+      disableGameButtons(true); // disable stats while paused
+      logEvent('paused', 'system', { half: 2, timerSeconds: state.timerSeconds });
+    } else {
+      startTimerInterval();
+      logEvent('resumed', 'system', { half: 2 });
+    }
+    return;
+  }
+
+  // any other presses do nothing
 }
+
 
 function disableGameButtons(disabled) {
   const buttons = [
@@ -443,87 +591,76 @@ function updatePossession() {
 }
 
 function endGame() {
-  if (confirm('Are you sure you want to end the game? This will reset all stats.')) {
-    // Stop timer
+  // Only useful during second half to finish match
+  if (state.currentHalf === 2) {
     if (state.timerRunning) {
       clearInterval(state.timerInterval);
+      state.timerRunning = false;
     }
-    
-    // Calculate and log final stats
-    const finalHomeConsecutive = state.homeConsecutivePasses;
-    const finalAwayConsecutive = state.awayConsecutivePasses;
-    
-    // Update max consecutive if current streak is higher
-    if (finalHomeConsecutive > state.homeMaxConsecutivePasses) {
-      state.homeMaxConsecutivePasses = finalHomeConsecutive;
-    }
-    if (finalAwayConsecutive > state.awayMaxConsecutivePasses) {
-      state.awayMaxConsecutivePasses = finalAwayConsecutive;
-    }
-    
-    // Log game summary
-    logEvent('game_ended', 'system', {
-      homeMaxConsecutivePasses: state.homeMaxConsecutivePasses,
-      awayMaxConsecutivePasses: state.awayMaxConsecutivePasses,
-      homeScore: state.homeScore,
-      awayScore: state.awayScore,
-      totalEvents: state.eventLog.length
-    });
-    
-    console.log('=== GAME SUMMARY ===');
-    console.log(`Home Max Consecutive Passes: ${state.homeMaxConsecutivePasses}`);
-    console.log(`Away Max Consecutive Passes: ${state.awayMaxConsecutivePasses}`);
-    console.log('Event Log:', state.eventLog);
-    
-    // Reset state
-    state.homeScore = 0;
-    state.awayScore = 0;
-    state.homeShots = 0;
-    state.awayShots = 0;
-    state.homeShotsOnTarget = 0;
-    state.awayShotsOnTarget = 0;
-    state.homeCorners = 0;
-    state.awayCorners = 0;
-    state.homePasses = 0;
-    state.awayPasses = 0;
-    state.timerRunning = false;
-    state.timerSeconds = 0;
-    state.possession = null;
-    state.homeConsecutivePasses = 0;
-    state.awayConsecutivePasses = 0;
-    state.homeMaxConsecutivePasses = 0;
-    state.awayMaxConsecutivePasses = 0;
-    state.reverseMode = false;
-    state.eventLog = [];
-    
-    // Update displays
-    updateScoreDisplay();
-    updateTimerDisplay();
-    updateStats();
-    updatePossession();
-    
-    // Reset buttons
+    logEvent('match_finished', 'system', { timerSeconds: state.timerSeconds });
     disableGameButtons(true);
-    document.getElementById('playPauseBtn').textContent = '▶';
-    const reverseBtn = document.getElementById('reverseBtn');
-    reverseBtn.classList.remove('active');
-    reverseBtn.style.backgroundColor = '';
-    reverseBtn.style.color = '';
-    
-    // Restore action button text
-    const actionButtons = [
-      'homeShot', 'homeShotOnGoal', 'homeGoal', 'homeCorner',
-      'awayShot', 'awayShotOnGoal', 'awayGoal', 'awayCorner'
-    ];
-    actionButtons.forEach(id => {
-      const btn = document.getElementById(id);
-      if (btn && btn.hasAttribute('data-original-text')) {
-        btn.textContent = btn.getAttribute('data-original-text');
-      }
-    });
-    
-    console.log('Game ended and reset');
+    showFinalModal();
+    return;
   }
+}
+
+
+function resetGame() {
+  // Stop timer
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  // Reset state values
+  state.homeScore = 0;
+  state.awayScore = 0;
+  state.homeShots = 0;
+  state.awayShots = 0;
+  state.homeShotsOnTarget = 0;
+  state.awayShotsOnTarget = 0;
+  state.homeCorners = 0;
+  state.awayCorners = 0;
+  state.homePasses = 0;
+  state.awayPasses = 0;
+  state.timerRunning = false;
+  state.timerSeconds = 0;
+  state.possession = null;
+  state.homeConsecutivePasses = 0;
+  state.awayConsecutivePasses = 0;
+  state.homeMaxConsecutivePasses = 0;
+  state.awayMaxConsecutivePasses = 0;
+  state.reverseMode = false;
+  state.eventLog = [];
+  state.currentHalf = 0;
+  state.configured = false;
+  state.halftimeSnapshot = null;
+
+  // Update UI
+  updateScoreDisplay();
+  updateTimerDisplay();
+  updateStats();
+  updatePossession();
+  disableGameButtons(true);
+  document.getElementById('playPauseBtn').textContent = '▶';
+  document.getElementById('playPauseBtn').disabled = false;
+
+  // Restore reverse button state
+  const reverseBtn = document.getElementById('reverseBtn');
+  reverseBtn.classList.remove('active');
+  reverseBtn.style.backgroundColor = '';
+  reverseBtn.style.color = '';
+
+  // Restore action button text
+  const actionButtons = [
+    'homeShot', 'homeShotOnGoal', 'homeGoal', 'homeCorner',
+    'awayShot', 'awayShotOnGoal', 'awayGoal', 'awayCorner'
+  ];
+  actionButtons.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn && btn.hasAttribute('data-original-text')) {
+      btn.textContent = btn.getAttribute('data-original-text');
+    }
+  });
+
+  // Reopen configuration to start a new match
+  showConfigModal();
 }
 
 // Handle orientation changes for better responsive experience

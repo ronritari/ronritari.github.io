@@ -16,6 +16,28 @@
 
 <body>
 
+<!-- Configuration Modal -->
+<div id="configModal" class="config-modal">
+  <div class="config-modal-content">
+    <h2>Match Configuration</h2>
+    <form id="configForm">
+      <label for="homeTeamInput">Home team</label>
+      <input id="homeTeamInput" type="text" value="Home team name" />
+      <label for="awayTeamInput">Away team</label>
+      <input id="awayTeamInput" type="text" value="Away team name" />
+      <label for="halfLengthSelect">Half length (minutes)</label>
+      <select id="halfLengthSelect">
+        <option value="15">15</option>
+        <option value="30">30</option>
+        <option value="45" selected>45</option>
+      </select>
+      <div class="config-actions">
+        <button type="submit" id="startMatchBtn" class="btn btn-play-pause">Start Match</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- FutStats Dashboard -->
 <div id="futstats" class="dashboard-section">
   <div class="dashboard-container">
@@ -152,6 +174,26 @@
 <script src="../js/bootstrap.js"></script>
 <!-- FutStats Custom JavaScript -->
 <script src="js/futstats.js"></script>
+<!-- Halftime & Final Modals -->
+<div id="halftimeModal" class="config-modal hidden">
+  <div class="config-modal-content">
+    <h2>Halftime Summary</h2>
+    <div id="halftimeContent"></div>
+    <div class="config-actions">
+      <button id="startSecondHalfBtn" class="btn btn-play-pause">Start Second Half</button>
+    </div>
+  </div>
+</div>
+
+<div id="finalModal" class="config-modal hidden">
+  <div class="config-modal-content">
+    <h2>Full Time - Match Summary</h2>
+    <div id="finalContent"></div>
+    <div class="config-actions">
+      <button id="closeFinalBtn" class="btn btn-play-pause">Close</button>
+    </div>
+  </div>
+</div>
 </body>
 
 </html>

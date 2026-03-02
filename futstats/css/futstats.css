@@ -4,6 +4,60 @@
   box-sizing: border-box;
 }
 
+/* ===== CONFIG MODAL ===== */
+.config-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.config-modal-content {
+  background: #222;
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  max-width: 90%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+.config-modal-content h2 {
+  margin-top: 0;
+  font-size: 20px;
+  text-align: center;
+}
+.config-modal-content label {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+}
+.config-modal-content input,
+.config-modal-content select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background: #111;
+  color: #fff;
+}
+.config-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+.config-modal.hidden { display: none; }
+
+/* reuse same modal styles for halftime/final */
+.summary-row { margin: 8px 0; font-size: 14px; }
+.summary-label { font-weight: bold; display: inline-block; width: 160px; }
+.summary-value { display: inline-block; }
+
 html, body {
   margin: 0;
   padding: 0;
@@ -37,6 +91,7 @@ html, body {
   padding: 4px;
   box-sizing: border-box;
 }
+}
 
 .grid-item {
   padding: 10px;
@@ -44,6 +99,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
 }
 
 /* Grid positioning */
@@ -465,23 +521,26 @@ html, body {
   }
 
   .dashboard-section {
-    padding: 8px;
+    padding: 0;
     min-height: 100vh;
   }
 
   .dashboard-container {
     height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   .grid-layout {
     grid-template-columns: 1fr 0.5fr 1fr;
     grid-template-rows: 0.25fr 1.5fr 0.375fr;
-    gap: 6px;
-    padding: 6px;
+    gap: 2px;
+    padding: 2px;
+    box-sizing: border-box;
   }
 
   .grid-item {
-    padding: 6px;
+    padding: 2px;
   }
 
   .team-name {
@@ -568,23 +627,26 @@ html, body {
   }
 
   .dashboard-section {
-    padding: 8px;
+    padding: 0;
     min-height: 100vh;
   }
 
   .dashboard-container {
     height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   .grid-layout {
     grid-template-columns: 1fr 0.5fr 1fr;
     grid-template-rows: 0.25fr 1.5fr 0.375fr;
-    gap: 6px;
-    padding: 6px;
+    gap: 2px;
+    padding: 2px;
+    box-sizing: border-box;
   }
 
   .grid-item {
-    padding: 6px;
+    padding: 2px;
   }
 
   .team-name {
